@@ -1,12 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { inferAsyncReturnType } from "@trpc/server";
-// import { Profile } from "next-auth";
 import { z } from "zod";
+// import { Profile } from "next-auth";
 import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
-  createTRPCContext,
+  // createTRPCContext,
 } from "~/server/api/trpc";
 
 export const profileRouter = createTRPCRouter({
@@ -27,16 +27,21 @@ export const profileRouter = createTRPCRouter({
         },
       });
 
-      if (profile == null) return
+      if (profile == null) return;
 
-
-      return (
+ 
+      return {
         name: profile.name,
         image: profile.image,
         followersCount: profile._count.followers,
         followCount: profile._count.follows,
         tweetsCount: profile._count.tweets,
         isFollowing: profile.followers.length > 0,
-      )
+      }
     }),
-  })
+
+
+
+
+    
+  });
