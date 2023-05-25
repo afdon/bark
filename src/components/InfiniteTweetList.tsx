@@ -17,15 +17,21 @@ type Tweet = {
 };
 
 type InfiniteTweetListProps = {
-    isLoading: boolean
-    isError: boolean
-    hasMore: boolean
+    isLoading: boolean;
+    isError: boolean;
+    hasMore: boolean | undefined;
     fetchNewTweets: () => Promise<unknown>
     tweets?: Tweet[];
 };
 
 
-export function InfiniteTweetList({ tweets, isError, isLoading, fetchNewTweets, hasMore }: InfiniteTweetListProps) {
+export function InfiniteTweetList({ 
+    tweets, 
+    isError, 
+    isLoading, 
+    fetchNewTweets, 
+    hasMore = false 
+}: InfiniteTweetListProps) {
     if (isLoading) return (<h1>Loading...</h1>)
     if (isError) return (<h1>Error</h1>)
     if (tweets == null || tweets.length === 0) return (
