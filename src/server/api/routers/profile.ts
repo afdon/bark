@@ -19,7 +19,7 @@ export const profileRouter = createTRPCRouter({
         select: {
           name: true,
           image: true,
-          _count: { select: {followers: true, follows: true, tweets: true } },
+          _count: { select: { followers: true, follows: true, tweets: true } },
           followers:
             currentUserId == null
               ? undefined
@@ -29,7 +29,7 @@ export const profileRouter = createTRPCRouter({
 
       if (profile == null) return;
 
- 
+
       return {
         name: profile.name,
         image: profile.image,
@@ -39,9 +39,29 @@ export const profileRouter = createTRPCRouter({
         isFollowing: profile.followers.length > 0,
       }
     }),
+  toggleFollow: protectedProcedure.input(z.object({ userId: z.string() })).mutation(async ({ input: { userId }, ctx }) => {
+    const currentUserId = ctx.session.user.id
+    const existingFollow = await ctx.prisma.user.findFirst({
+      where: { id: userId, followers: { some: { id: currentUserId } } },
+    });
 
+    let addedFollow
+    if (existingFollow == null) {
+      await ctx.prisma.user.update({
+        where: { id: userId },
+        data: { followers: { connect: { id: currentUserId } } },
+      });
+      addedFollow = true
+    } else {
+      await ctx.prisma.user.update({
+        where: { id: userId },
+        data: { followers: { disconnect: { id: currentUserId } } },
+      });
+      addedFollow = false
+    }
 
+    // Revalidation
 
-
-
-  });
+    return { addedFollow }
+  }),
+});

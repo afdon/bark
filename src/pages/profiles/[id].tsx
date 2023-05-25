@@ -8,12 +8,18 @@ import { IconHoverEffect } from "~/components/IconHoverEffect";
 import { VscArrowLeft } from "react-icons/vsc";
 import { ProfileImage } from "~/components/ProfileImage";
 import { InfiniteTweetList } from "~/components/InfiniteTweetList";
+import { useSession } from "next-auth/react";
+import { Button } from "~/components/Button";
 
 const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
     id
 }) => {
     const { data: profile } = api.profile.getById.useQuery({ id });
     const tweets = api.tweet.infiniteProfileFeed.useInfiniteQuery({ userId: id }, { getNextPageParam: (lastPage) => lastPage.nextCursor })
+
+    const toggleFollow = api.profile.toggleFollow.useMutation({ onSuccess: ({ addedFollow }) => {
+
+    }});
 
     if (profile == null || profile.name == null)
         return (
@@ -44,7 +50,11 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                         {profile.followsCount} Following
                     </div>
                 </div>
-                    <FollowButton isFollowing={profile.isFollowing} userId={id} onClick={() => null} />
+                    <FollowButton 
+                    isFollowing={profile.isFollowing} 
+                    isLoading={toggleFollow.isLoading}
+                    userId={id} 
+                    onClick={() => toggleFollow.mutate({ userId: id })} />
                     </header>
                 <main>
                     <InfiniteTweetList
@@ -59,9 +69,32 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
     );
 };
 
-function FollowButton() {
-    return <h1>Follow</h1>
-}
+function FollowButton({ 
+    userId, 
+    isFollowing, 
+    isLoading,
+    onClick,
+ }: {
+    userId: string;
+    isFollowing: boolean;
+    isLoading: boolean;
+    onClick: () => void;
+ }) {
+    const session = useSession();
+
+    if (session.status !== "authenticated" || session.data.user.id === userId) {
+        return null;
+    }
+
+    return <Button
+    disabled={isLoading}
+    onClick={onClick}
+    small
+    gray={isFollowing}
+    >
+        {isFollowing ? "Unfollow" : "Follow"}
+    </Button>
+ }
 
 const pluralRules = new Intl.PluralRules()
 
