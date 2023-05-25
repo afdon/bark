@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { inferAsyncReturnType } from "@trpc/server";
 import { z } from "zod";
-// import { Profile } from "next-auth";
 import {
   createTRPCRouter,
   publicProcedure,
