@@ -29,7 +29,7 @@ const Home: NextPage = () => {
         <div className="flex">{TABS.map(
           tab => {
           return <button key={tab} className={`flex-grow p-2 hover:bg-gray-200 focus-visible:bg-gray-200 ${tab === selectedTab 
-            ? "border-b-4 border-b-blue-500 font-bold"
+            ? "border-b-4 border-b-orange-500 font-bold"
           : ""
         }`}
         onClick={() => setSelectedTab(tab)}
