@@ -1,4 +1,6 @@
+import Link from "next/link";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { ProfileImage } from "./ProfileImage";
 
 
 type Tweet = {
@@ -36,9 +38,22 @@ export function InfiniteTweetList({ tweets, isError, isLoading, fetchNewTweets, 
             loader={"Loading..."}
         >
             {tweets.map(tweet => {
-               return <div key={tweet.id}>{tweet.content}</div>
+               return <TweetCard key={tweet.id} {...tweet} />;
             })}
         </InfiniteScroll>
     </ul>
+    );
+}
+
+function TweetCard({ 
+    id, 
+    user, 
+    content, 
+    createdAt, 
+    likeCount, 
+    likedByMe,
+}: Tweet) {
+    return (
+        <li className="flex gap-4 border-b px-4 py-4"><Link href={`/profiles/${user.id}`}><ProfileImage src={user.image} /></Link></li>
     );
 }
