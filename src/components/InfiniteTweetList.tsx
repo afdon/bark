@@ -4,6 +4,7 @@ import { ProfileImage } from "./ProfileImage";
 import { useSession } from "next-auth/react";
 import { VscHeart, VscHeartFilled } from "react-icons/vsc";
 import { IconHoverEffect } from "./IconHoverEffect";
+import { api } from "~/utils/api";
 
 
 type Tweet = {
@@ -58,6 +59,45 @@ function TweetCard({
     likeCount, 
     likedByMe,
 }: Tweet) {
+    const trpcUtils = api.useContext()
+    const toggleLike = api.tweet.toggleLike.useMutation({ 
+        onSuccess: async ({ addedLike }) => {
+            const updateData: Parameters<
+            typeof trpcUtils.tweet.infiniteFeed.setInfiniteData
+            >[1] = (oldData) => {
+                if (oldData == null) return;
+
+                const countModifier = addedLike ? 1 : -1;
+
+                return {
+                    ...oldData,
+                    pages: oldData.pages.map(page => {
+                        return {
+                            ...page,
+                            tweets: page.tweets.map(tweet => {
+                                if (tweet.id === id) {
+                                    return {
+                                        ...tweet,
+                                        likeCount: tweet.likeCount + countModifier,
+                                        likedByMe: addedLike
+                                    }
+                                }
+
+                                return tweet
+                            })
+                        }
+                    })
+                }
+            };
+
+        trpcUtils.tweet.infiniteFeed.setInfiniteData({}, updateData);
+    },
+});
+
+    function handleToggleLike() {
+        toggleLike.mutate({ id })
+    }
+
     return (
         <li className="flex gap-4 border-b px-4 py-4">
             <Link href={`/profiles/${user.id}`}>
@@ -75,18 +115,20 @@ function TweetCard({
                     <span className="text-gray-500">{dateTimeFormatter.format(createdAt)}</span>
                 </div>
                 <p className="whitespace-pre-wrap">{content}</p>
-                <HeartButton likedByMe={likedByMe} likeCount={likeCount}  />
+                <HeartButton onClick={handleToggleLike} isLoading={toggleLike.isLoading} likedByMe={likedByMe} likeCount={likeCount}  />
             </div>
             </li>
     );
 }
 
 type HeartButtonProps = {
+    onClick: () => void;
+    isLoading: boolean;
     likedByMe: boolean
     likeCount: number
 }
 
-function HeartButton({ likedByMe, likeCount }: HeartButtonProps) {
+function HeartButton({ isLoading, onClick, likedByMe, likeCount }: HeartButtonProps) {
     const session = useSession()
     const HeartIcon = likedByMe ? VscHeartFilled : VscHeart;
 
@@ -101,6 +143,8 @@ function HeartButton({ likedByMe, likeCount }: HeartButtonProps) {
 
     return (
         <button
+        disabled={isLoading}
+        onClick={onClick}
         className={`group -ml-2 items-center gap-1 self-start flex transition-colors duration-200 ${
             likedByMe 
             ? "text-red-500"
