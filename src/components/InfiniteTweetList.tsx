@@ -1,3 +1,4 @@
+import InfiniteScroll from "react-infinite-scroll-component";
 
 
 type Tweet = {
@@ -26,5 +27,18 @@ export function InfiniteTweetList({ tweets, isError, isLoading, fetchNewTweets, 
     )
 
 
-    return (<ul></ul>)
+    return (
+    <ul>
+        <InfiniteScroll
+            dataLength={tweets.length}
+            next={fetchNewTweets}
+            hasMore={hasMore}
+            loader={"Loading..."}
+        >
+            {tweets.map(tweet => {
+               return <div key={tweet.id}>{tweet.content}</div>
+            })}
+        </InfiniteScroll>
+    </ul>
+    );
 }
