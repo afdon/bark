@@ -14,7 +14,7 @@ export const tweetRouter = createTRPCRouter({
       ).query(async ({ input: { limit = 10, cursor }, ctx}) => {
         ctx.prisma.tweet.findMany({
           take: limit + 1,
-          cursor: cursor ? { id: cursor } : undefined,
+          cursor: cursor ? { createdAt_id: cursor } : undefined,
           orderBy: [{ createdAt: "desc" }, { id: "desc" }]
         })
       }),
