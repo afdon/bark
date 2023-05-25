@@ -54,7 +54,7 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                     </h1>
                     <div className="text-gray-500">
                         {profile.tweetsCount} {" "}
-                        {getPlural(profile.tweetsCount, "Tweet", "Tweets")} - {" "}
+                        {getPlural(profile.tweetsCount, "Bark", "Barks")} - {" "}
                         {profile.followersCount} {" "}
                         {getPlural(profile.followsCount, "Follower", "Followers")} - {" "}
                         {profile.followsCount} Following

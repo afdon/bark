@@ -91,7 +91,7 @@ function Form() {
                     className="flex-grow resize-none overflow-hidden p-4 text-lg outline-none " placeholder="What's up, dog?" />
             </div>
             <Button className="self-end">
-                tweet
+                Bark
             </Button>
         </form>
     );
