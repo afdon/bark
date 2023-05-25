@@ -12,47 +12,48 @@ export const tweetRouter = createTRPCRouter({
   infiniteFeed: publicProcedure
     .input(
       z.object({
-        onlyFollowing: z.boolean().optional(),
+        onlyFollowing: z.boolean().optional(), // needed?
         limit: z.number().optional(),
         cursor: z.object({ id: z.string(), createdAt: z.date() }).optional(),
       })
     )
     .query(
-      async ({ 
-        input: { limit = 10, onlyFollowing = false, cursor }, 
-        ctx 
+      async ({
+        input: { limit = 10, onlyFollowing = false, cursor },
+        ctx
       }) => {
         const currentUserId = ctx.session?.user.id
         return await getInfiniteTweets({
-          limit, ctx, cursor, whereClause: currentUserId == null || !onlyFollowing ? undefined: {
+          limit, ctx, cursor, whereClause: currentUserId == null || !onlyFollowing ? undefined : {
             user: {
               followers: { some: { id: currentUserId } },
             },
           },
-      });
+        });
 
-      let nextCursor: typeof cursor | undefined
+        // let nextCursor: typeof cursor | undefined
 
-      if (data.length > limit) {
-        const nextItem = data.pop()
-        if (nextItem != null) {
-          nextCursor = { id: nextItem.id, createdAt: nextItem.createdAt }
-        }
+        // if (data.length > limit) {
+        //   const nextItem = data.pop()
+        //   if (nextItem != null) {
+        //     nextCursor = { id: nextItem.id, createdAt: nextItem.createdAt }
+        //   }
+        // }
+
+        // return {
+        //   tweets: data.map(tweet => {
+        //     return {
+        //       id: tweet.id,
+        //       content: tweet.content,
+        //       createdAt: tweet.createdAt,
+        //       likeCount: tweet._count.likes,
+        //       user: tweet.user,
+        //       likedByMe: tweet.likes?.length > 0, // you've liked this
+        //     }
+        //   }), nextCursor
+
       }
-
-      return {
-        tweets: data.map(tweet => {
-          return {
-            id: tweet.id,
-            content: tweet.content,
-            createdAt: tweet.createdAt,
-            likeCount: tweet._count.likes,
-            user: tweet.user,
-            likedByMe: tweet.likes?.length > 0, // you've liked this
-          }
-        }), nextCursor
-      };
-    }),
+    ),
   create: protectedProcedure
     .input(z.object({ content: z.string() }))
     .mutation(async ({ input: { content }, ctx }) => {
@@ -111,8 +112,7 @@ async function getInfiniteTweets({
     },
   });
 
-  let nextCursor: typeof cursor | undefined
-
+  let nextCursor: typeof cursor | undefined;
   if (data.length > limit) {
     const nextItem = data.pop()
     if (nextItem != null) {
