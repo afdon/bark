@@ -25,10 +25,10 @@ const ProfilePage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 };
 
 export const getStaticPaths: GetStaticPaths = () => {
-    return (
+    return {
         paths: [],
         fallback: "blocking",
-    );
+    };
 };
 
 export async function getStaticProps(
